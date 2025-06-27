@@ -1,33 +1,157 @@
-# open-source terraform-aws-alb-module is using
-module "backend_alb" {
-    source                  = "terraform-aws-modules/alb/aws"
-    version                 = "9.16.0"
-    internal                = true 
-    vpc_id                  = local.vpc_id
-    subnets                 = local.private_subnet_ids
-    create_security_group   = false
-    security_groups         = [local.backend_alb_sg_id]
-
-    tags = merge(
-        local.common_tags,
-        {
-            Name = "${local.Name}-backend_alb"
-        }
-    )
+# mongodb instance creation
+resource "aws_instance" "mongodb" {
+  ami                    = local.ami_id
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = [local.mongodb_sg_id]
+  subnet_id              = local.database_subnet_id
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.Name}-mongodb"
+    }
+  )
 }
 
-resource "aws_lb_listener" "backend_alb" {
-  load_balancer_arn = module.backend_alb.arn
-  port              = "80"
-  protocol          = "HTTP"
+# mongodb configuration using ansible-pull 
+resource "terraform_data" "mongodb" {
+  triggers_replace = [
+    aws_instance.mongodb.id
+  ]
 
-  default_action {
-    type = "fixed-response"
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+  connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+    host     = aws_instance.mongodb.private_ip
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo sh /tmp/bootstrap.sh mongodb"
+    ]
+  }
+}
 
-    fixed_response {
-      content_type = "text/html"
-      message_body = "<h1> Hello , iam from backend ALB</h1>"
-      status_code  = "200"
+
+
+# redis instance creation
+resource "aws_instance" "redis" {
+  ami                    = local.ami_id
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = [local.redis_sg_id]
+  subnet_id              = local.database_subnet_id
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.Name}-redis"
     }
+  )
+}
+
+# redis configuration using ansible-pull 
+resource "terraform_data" "redis" {
+  triggers_replace = [
+    aws_instance.redis.id
+  ]
+
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+  connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+    host     = aws_instance.redis.private_ip
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo sh /tmp/bootstrap.sh redis"
+    ]
+  }
+}
+
+
+
+# mysql instance creation
+resource "aws_instance" "mysql" {
+  ami                    = local.ami_id
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = [local.mysql_sg_id]
+  subnet_id              = local.database_subnet_id
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.Name}-mysql"
+    }
+  )
+}
+
+# mysql configuration using ansible-pull 
+resource "terraform_data" "mysql" {
+  triggers_replace = [
+    aws_instance.mysql.id
+  ]
+
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+  connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+    host     = aws_instance.mysql.private_ip
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo sh /tmp/bootstrap.sh mysql"
+    ]
+  }
+}
+
+
+
+# rabbitmq instance creation
+resource "aws_instance" "rabbitmq" {
+  ami                    = local.ami_id
+  instance_type          = "t3.micro"
+  vpc_security_group_ids = [local.rabbitmq_sg_id]
+  subnet_id              = local.database_subnet_id
+  tags = merge(
+    local.common_tags,
+    {
+      Name = "${local.Name}-rabbitmq"
+    }
+  )
+}
+
+# rabbitmq configuration using ansible-pull 
+resource "terraform_data" "rabbitmq" {
+  triggers_replace = [
+    aws_instance.rabbitmq.id
+  ]
+
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+  connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    password = "DevOps321"
+    host     = aws_instance.rabbitmq.private_ip
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo sh /tmp/bootstrap.sh rabbitmq"
+    ]
   }
 }
