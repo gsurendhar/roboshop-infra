@@ -17,3 +17,7 @@ variable "sg_name" {
 variable "sg_description" {
   default        = "creating sg for frontend instance"
 }
+
+variable "vpn_ports" {
+  default = [22, 443, 943, 1194]
+}

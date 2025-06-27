@@ -9,3 +9,9 @@ resource "aws_ssm_parameter" "bastion_sg_id" {
     type    = "String"
     value   = module.bastion.sg_id 
 }
+
+resource "aws_ssm_parameter" "vpn_sg_id" {
+    name    = "/${var.project}/${var.environment}/vpn_sg_id"
+    type    = "String"
+    value   = module.vpn.sg_id 
+}
