@@ -1,6 +1,6 @@
 # open-source terraform-aws-alb-module is using
 module "backend_alb" {
-    source                  = "terraform-aws-module/alb/aws"
+    source                  = "terraform-aws-modules/alb/aws"
     version                 = "9.16.0"
     internal                = true 
     vpc_id                  = local.vpc_id
@@ -14,4 +14,20 @@ module "backend_alb" {
             Name = "${local.Name}-backend_alb"
         }
     )
+}
+
+resource "aws_lb_listener" "backend_alb" {
+  load_balancer_arn = module.backend_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/html"
+      message_body = "<h1> Hello , iam from backend ALB</h1>"
+      status_code  = "200"
+    }
+  }
 }
