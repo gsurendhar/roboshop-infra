@@ -14,7 +14,7 @@ module "bastion" {
   source         = "git::https://github.com/gsurendhar/terraform-aws-security-group-module.git?ref=master"
   project        = var.project
   environment    = var.environment
-  sg_name        = "${local.Name}-bastion"
+  sg_name        = "bastion"
   sg_description = "created sg for bastion instances"
   vpc_id         = local.vpc_id
 }
@@ -24,7 +24,7 @@ module "backend_alb" {
   source         = "git::https://github.com/gsurendhar/terraform-aws-security-group-module.git?ref=master"
   project        = var.project
   environment    = var.environment
-  sg_name        = "${local.Name}-backend_alb"
+  sg_name        = "backend_alb"
   sg_description = "created sg for backend load balancer"
   vpc_id         = local.vpc_id
 }
@@ -34,7 +34,7 @@ module "vpn" {
   source         = "git::https://github.com/gsurendhar/terraform-aws-security-group-module.git?ref=master"
   project        = var.project
   environment    = var.environment
-  sg_name        = "${local.Name}-vpn"
+  sg_name        = "vpn"
   sg_description = "created sg for vpn"
   vpc_id         = local.vpc_id
 }
@@ -79,6 +79,15 @@ module "rabbitmq" {
   vpc_id         = local.vpc_id
 }
 
+#  creating SG for catalogue to connection from bastion and vpn
+module "catalogue" {
+  source         = "git::https://github.com/gsurendhar/terraform-aws-security-group-module.git?ref=master"
+  project        = var.project
+  environment    = var.environment
+  sg_name        = "catalogue"
+  sg_description = "created sg for catalogue"
+  vpc_id         = local.vpc_id
+}
 
 
 
@@ -163,4 +172,44 @@ resource "aws_security_group_rule" "rabbitmq_ssh_vpn" {
   # cidr_blocks       = ["0.0.0.0/0"]
   source_security_group_id = module.vpn.sg_id
   security_group_id        = module.rabbitmq.sg_id
+}
+
+# catalogue connection to open backend_alb 8080 port 
+resource "aws_security_group_rule" "catalogue_backend_alb" {
+  type      = "ingress"
+  from_port = 8080
+  to_port   = 8080
+  protocol  = "tcp"
+  source_security_group_id = module.backend_alb.sg_id
+  security_group_id        = module.catalogue.sg_id
+}
+
+# catalogue connection to open vpn 22  port 
+resource "aws_security_group_rule" "catalogue_vpn_ssh" {
+  type      = "ingress"
+  from_port = 22
+  to_port   = 22
+  protocol  = "tcp"
+  source_security_group_id = module.vpn.sg_id
+  security_group_id        = module.catalogue.sg_id
+}
+
+# catalogue connection to open vpn 8080  port 
+resource "aws_security_group_rule" "catalogue_vpn_http" {
+  type      = "ingress"
+  from_port = 8080
+  to_port   = 8080
+  protocol  = "tcp"
+  source_security_group_id = module.vpn.sg_id
+  security_group_id        = module.catalogue.sg_id
+}
+
+# mongodb connection to open catalogue 27017  port 
+resource "aws_security_group_rule" "mongodb_catalogue" {
+  type      = "ingress"
+  from_port = 27017
+  to_port   = 27017
+  protocol  = "tcp"
+  source_security_group_id = module.catalogue.sg_id
+  security_group_id        = module.mongodb.sg_id
 }
