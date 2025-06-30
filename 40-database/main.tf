@@ -84,6 +84,7 @@ resource "aws_instance" "mysql" {
   instance_type          = "t3.micro"
   vpc_security_group_ids = [local.mysql_sg_id]
   subnet_id              = local.database_subnet_id
+  iam_instance_profile = "EC2RoleToFetchSSMParams"
   tags = merge(
     local.common_tags,
     {
@@ -154,4 +155,58 @@ resource "terraform_data" "rabbitmq" {
       "sudo sh /tmp/bootstrap.sh rabbitmq"
     ]
   }
+}
+
+
+# Create a Route 53 Hosted Zone
+resource "aws_route53_zone" "my_zone" {
+  name = "gonela.site" # Replace with your domain name
+}
+
+# to get name servers of hosted zone
+data "aws_route53_zone" "selected" {
+  # name         = "gonela.site" # Replace with your domain name
+  # or
+  zone_id = aws_route53_zone.my_zone.id           #"Z2FDTNDUVT1FRY"  Replace with your hosted zone ID
+}
+
+#outputs of hosted zone name servers
+output "name_servers" {
+  value = data.aws_route53_zone.selected.name_servers
+}
+
+resource "aws_route53_record" "mongodb" {
+  zone_id   = aws_route53_zone.my_zone.id
+  name      = "mongodb.${data.aws_route53_zone.selected.name}"
+  type      = "A"
+  ttl       = 1
+  records   = [aws_instance.mongodb.private_ip]
+  allow_overwrite =  true
+}
+
+resource "aws_route53_record" "redis" {
+  zone_id   = aws_route53_zone.my_zone.id
+  name      = "redis.${data.aws_route53_zone.selected.name}"
+  type      = "A"
+  ttl       = 1
+  records   = [aws_instance.redis.private_ip]
+  allow_overwrite =  true
+}
+
+resource "aws_route53_record" "mysql" {
+  zone_id   = aws_route53_zone.my_zone.id
+  name      = "mysql.${data.aws_route53_zone.selected.name}"
+  type      = "A"
+  ttl       = 1
+  records   = [aws_instance.mysql.private_ip]
+  allow_overwrite =  true
+}
+
+resource "aws_route53_record" "rabbitmq" {
+  zone_id   = aws_route53_zone.my_zone.id
+  name      = "rabbitmq.${data.aws_route53_zone.selected.name}"
+  type      = "A"
+  ttl       = 1
+  records   = [aws_instance.rabbitmq.private_ip]
+  allow_overwrite =  true
 }
