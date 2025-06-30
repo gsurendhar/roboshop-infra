@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket         = "terraform-re-backend"
-    key            = "remote-module-test"
+    key            = "remote-module-vpc"
     region         = "us-east-1"
     # dynamodb_table = "remote-lock"
     # use_lockfile = true
