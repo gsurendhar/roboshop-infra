@@ -1,3 +1,7 @@
+data "aws_ssm_parameter" "vpc_id" {
+  name = "/${var.project}/${var.environment}/vpc_id"
+}
+
 data "aws_ssm_parameter" "mongodb_sg_id" {
   name = "/${var.project}/${var.environment}/mongodb_sg_id"
 }

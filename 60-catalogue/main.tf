@@ -1,3 +1,20 @@
+# Backend_ALB Target_group of Catalogue
+resource "aws_lb_target_group" "catalogue" {
+  name     = "${local.Name}-catalogue"
+  port     = 8080
+  protocol = "HTTP"
+  vpc_id   = local.vpc_id
+  health_check {
+    healthy_threshold   = 2
+    interval            = 15
+    matcher             = "200-299"
+    path                = "/health"
+    port                = "8080"
+    timeout             = 2
+    unhealthy_threshold = 3
+  }
+}
+
 # catalogue instance creation
 resource "aws_instance" "catalogue" {
   ami                    = local.ami_id
@@ -34,16 +51,4 @@ resource "terraform_data" "catalogue" {
       "sudo sh /tmp/bootstrap.sh catalogue"
     ]
   }
-}
-
-
-
-
-resource "aws_route53_record" "catalogue" {
-  zone_id   = data.aws_route53_zone.selected.zone_id
-  name      = "catalogue.${data.aws_route53_zone.selected.name}"
-  type      = "A"
-  ttl       = 1
-  records   = [aws_instance.catalogue.private_ip]
-  allow_overwrite =  true
 }
