@@ -124,7 +124,7 @@ module "frontend" {
   source         = "git::https://github.com/gsurendhar/terraform-aws-security-group-module.git?ref=master"
   project        = var.project
   environment    = var.environment
-  sg_name        = "${local.Name}-${var.sg_name}"
+  sg_name        = var.sg_name
   sg_description = var.sg_description
   vpc_id = local.vpc_id
 }
