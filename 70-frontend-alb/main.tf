@@ -3,7 +3,7 @@ module "frontend_alb" {
     source                  = "terraform-aws-modules/alb/aws"
     version                 = "9.16.0"
     internal                = false 
-    name                    = "${local.Name}-frontend_alb"
+    name                    = "${local.Name}-frontend-alb"
     vpc_id                  = local.vpc_id
     subnets                 = local.public_subnet_ids
     create_security_group   = false
@@ -40,7 +40,7 @@ resource "aws_lb_listener" "frontend_alb" {
 
 resource "aws_route53_record" "frontend_alb" {
   zone_id = data.aws_route53_zone.selected.zone_id
-  name    = "*.${data.aws_route53_zone.selected.name}"   #.gonela.site
+  name    = "*.${data.aws_route53_zone.selected.name}"   #*.gonela.site
   type    = "A"
 
   alias {
