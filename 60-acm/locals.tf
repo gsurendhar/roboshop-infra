@@ -1,5 +1,5 @@
 locals {
-  zone_id                  = data.aws_ssm_parameter.zone_id.value
+  # zone_id                  = data.aws_ssm_parameter.zone_id.value
 
   common_tags = {
     Project     = var.project

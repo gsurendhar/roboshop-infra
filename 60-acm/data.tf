@@ -1,6 +1,6 @@
-data "aws_ssm_parameter" "zone_id" {
-  name = "/${var.project}/${var.environment}/zone_id"
-}
+# data "aws_ssm_parameter" "zone_id" {
+#   name = "/${var.project}/${var.environment}/zone_id"
+# }
 
 
 
