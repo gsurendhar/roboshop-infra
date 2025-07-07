@@ -128,13 +128,13 @@ resource "aws_launch_template" "catalogue" {
 
 resource "aws_autoscaling_group" "catalogue" {
   name                      = "${local.Name}-catalogue"
-  desired_capacity          = 1
+  desired_capacity          = 2
   max_size                  = 5
   min_size                  = 1
   health_check_grace_period = 90
   health_check_type         = "ELB"
   vpc_zone_identifier       = local.private_subnet_ids
-  target_group_arns         = aws_lb_target_group.catalogue.arn 
+  target_group_arns         = [aws_lb_target_group.catalogue.arn]
  
  
   launch_template {
@@ -176,6 +176,7 @@ resource "aws_autoscaling_group" "catalogue" {
 resource "aws_autoscaling_policy" "catalogue" {
   name                   = "${local.Name}-catalogue"
   autoscaling_group_name = aws_autoscaling_group.catalogue.name
+  policy_type            = "TargetTrackingScaling"
 
   target_tracking_configuration {
     predefined_metric_specification {
