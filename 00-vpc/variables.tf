@@ -21,3 +21,8 @@ variable database_subnet_cidrs {
 variable is_peering_required {
     default = false
 }
+
+variable "is_NAT_required" {
+   type        = string
+   default     = true
+}
