@@ -18,7 +18,4 @@ locals {
 
   Name = "${var.project}-${var.environment}"
 
-  zone_name = data.aws_route53_zone.selected.name
-  zone_id = data.aws_route53_zone.selected.zone_id
-
 }
