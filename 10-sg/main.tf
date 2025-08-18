@@ -567,15 +567,15 @@ resource "aws_security_group_rule" "frontend_frontend_alb" {
 
 
 
-#  BACKEND_ALB accepting connections from bastion 80 port 
-resource "aws_security_group_rule" "backend_alb_bastion_http" {
-  type      = "ingress"
-  from_port = 80
-  to_port   = 80
-  protocol  = "tcp"
-  source_security_group_id = module.bastion.sg_id
-  security_group_id        = module.backend_alb.sg_id
-}
+# #  BACKEND_ALB accepting connections from bastion 80 port 
+# resource "aws_security_group_rule" "backend_alb_bastion_http" {
+#   type      = "ingress"
+#   from_port = 80
+#   to_port   = 80
+#   protocol  = "tcp"
+#   source_security_group_id = module.bastion.sg_id
+#   security_group_id        = module.backend_alb.sg_id
+# }
 
 #  BACKEND_ALB accepting connections from openvpn 80 port 
 resource "aws_security_group_rule" "backend_alb_vpn_http" {
