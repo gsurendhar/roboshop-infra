@@ -177,7 +177,8 @@ output "name_servers" {
 
 resource "aws_route53_record" "mongodb" {
   zone_id   = aws_route53_zone.my_zone.id
-  name      = "mongodb.${data.aws_route53_zone.selected.name}"
+  # name      = "mongodb.${data.aws_route53_zone.selected.name}"
+  name      = "mongodb-${var.environment}.${data.aws_route53_zone.selected.name}"
   type      = "A"
   ttl       = 1
   records   = [aws_instance.mongodb.private_ip]
@@ -186,7 +187,8 @@ resource "aws_route53_record" "mongodb" {
 
 resource "aws_route53_record" "redis" {
   zone_id   = aws_route53_zone.my_zone.id
-  name      = "redis.${data.aws_route53_zone.selected.name}"
+  # name      = "redis.${data.aws_route53_zone.selected.name}"
+  name      = "redis-${var.environment}.${data.aws_route53_zone.selected.name}"
   type      = "A"
   ttl       = 1
   records   = [aws_instance.redis.private_ip]
@@ -195,7 +197,8 @@ resource "aws_route53_record" "redis" {
 
 resource "aws_route53_record" "mysql" {
   zone_id   = aws_route53_zone.my_zone.id
-  name      = "mysql.${data.aws_route53_zone.selected.name}"
+  # name      = "mysql.${data.aws_route53_zone.selected.name}"
+  name      = "mysql-${var.environment}.${data.aws_route53_zone.selected.name}"
   type      = "A"
   ttl       = 1
   records   = [aws_instance.mysql.private_ip]
@@ -204,7 +207,8 @@ resource "aws_route53_record" "mysql" {
 
 resource "aws_route53_record" "rabbitmq" {
   zone_id   = aws_route53_zone.my_zone.id
-  name      = "rabbitmq.${data.aws_route53_zone.selected.name}"
+  # name      = "rabbitmq.${data.aws_route53_zone.selected.name}"
+  name      = "rabbitmq-${var.environment}.${data.aws_route53_zone.selected.name}"
   type      = "A"
   ttl       = 1
   records   = [aws_instance.rabbitmq.private_ip]
